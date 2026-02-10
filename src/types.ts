@@ -158,10 +158,10 @@ export interface ChannelTalkEntity {
  * Sent when messages are created or other events occur
  */
 export interface ChannelTalkWebhookEvent {
-  /** Event type (e.g., 'message.created') */
+  /** Event action (e.g., 'push') */
   event: string;
-  /** Event type identifier */
-  type: string;
+  /** Event type identifier (e.g., 'message.created.teamChat') — may be absent for push events */
+  type?: string;
   /** Entity data (message content, metadata) */
   entity: ChannelTalkEntity;
   /** References to related entities (manager, group) */

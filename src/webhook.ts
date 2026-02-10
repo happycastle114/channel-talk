@@ -101,7 +101,7 @@ export async function startChannelTalkWebhook(
 
   async function handleWebhookEvent(event: ChannelTalkWebhookEvent): Promise<void> {
     const isTeamChatMessage =
-      (event.event === 'push' && event.type === 'message') ||
+      event.event === 'push' ||
       event.type === 'message.created.teamChat';
 
     if (!isTeamChatMessage) {
@@ -145,7 +145,7 @@ export async function startChannelTalkWebhook(
     }
 
     const refers = event.refers;
-    const groupId = refers?.group?.id;
+    const groupId = entity.chatId ?? refers?.group?.id;
     if (!groupId) {
       log.debug?.('skipping message without group id');
       return;
