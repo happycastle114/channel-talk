@@ -1,0 +1,33 @@
+{
+  "name": "@openclaw/channel-talk",
+  "version": "2026.2.10-1",
+  "description": "OpenClaw Channel Talk (채널톡) Team Chat channel plugin",
+  "type": "module",
+  "dependencies": {
+    "express": "^4.19.0",
+    "openclaw": "workspace:*"
+  },
+  "openclaw": {
+    "extensions": [
+      "./index.ts"
+    ],
+    "channel": {
+      "id": "channel-talk",
+      "label": "Channel Talk",
+      "selectionLabel": "Channel Talk (채널톡)",
+      "docsPath": "channel-talk",
+      "docsLabel": "Channel Talk Setup",
+      "blurb": "채널톡 Team Chat integration",
+      "aliases": [
+        "channeltalk",
+        "채널톡"
+      ],
+      "order": 110
+    },
+    "install": {
+      "npmSpec": "@openclaw/channel-talk",
+      "localPath": "extensions/channel-talk",
+      "defaultChoice": false
+    }
+  }
+}
