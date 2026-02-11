@@ -1,5 +1,5 @@
 {
-  "id": "channel-talk",
+  "id": "openclaw-channel-talk",
   "channels": [
     "channel-talk"
   ],
@@ -41,13 +41,18 @@
       },
       "groupPolicy": {
         "type": "string",
-        "enum": ["open", "closed"],
+        "enum": [
+          "open",
+          "closed"
+        ],
         "default": "open",
         "description": "Group chat policy"
       },
       "allowedGroups": {
         "type": "array",
-        "items": { "type": "string" },
+        "items": {
+          "type": "string"
+        },
         "description": "List of group chatIds to respond to"
       },
       "mentionOnly": {
