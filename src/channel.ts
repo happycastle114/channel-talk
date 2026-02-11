@@ -43,7 +43,7 @@ const meta = {
 } as const;
 
 export const channelTalkPlugin: ChannelPlugin<ResolvedChannelTalkAccount> = {
-  id: 'openclaw-channel-talk',
+  id: 'channel-talk',
 
   meta: { ...meta },
 

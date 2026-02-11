@@ -1,4 +1,4 @@
-# @happycastle/openclaw-channel-talk
+# @happycastle/channel-talk
 
 > ⚠️ **Unofficial** — 이 플러그인은 Channel Corp 또는 OpenClaw 팀과 관련이 없는 커뮤니티 프로젝트입니다.
 
@@ -35,14 +35,14 @@
 **npm을 통한 설치 (권장):**
 
 ```bash
-openclaw plugins install @happycastle/openclaw-channel-talk
+openclaw plugins install @happycastle/channel-talk
 ```
 
 **로컬 설치 (개발용):**
 
 ```bash
-git clone https://github.com/happycastle114/openclaw-channel-talk.git
-cd openclaw-channel-talk
+git clone https://github.com/happycastle114/channel-talk.git
+cd channel-talk
 npm install
 # OpenClaw extensions 디렉토리에 복사하거나 심볼릭 링크를 생성합니다
 ```
@@ -233,20 +233,20 @@ openclaw gateway start
 
 ```bash
 # 기존 플러그인 삭제 후 재설치
-rm -rf ~/.openclaw/extensions/openclaw-channel-talk
-openclaw plugins install @happycastle/openclaw-channel-talk
+rm -rf ~/.openclaw/extensions/channel-talk
+openclaw plugins install @happycastle/channel-talk
 ```
 
 ### plugin id mismatch 경고
 
-이 플러그인의 plugin id는 `openclaw-channel-talk`입니다.
-설정의 `plugins.entries`에서 `openclaw-channel-talk`을 키로 사용해야 합니다:
+이 플러그인의 plugin id는 `channel-talk`입니다.
+설정의 `plugins.entries`에서 `channel-talk`을 키로 사용해야 합니다:
 
 ```json
 {
   "plugins": {
     "entries": {
-      "openclaw-channel-talk": { "enabled": true }
+      "channel-talk": { "enabled": true }
     }
   }
 }
