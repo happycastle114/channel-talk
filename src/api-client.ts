@@ -40,7 +40,7 @@ export function createApiClient(
      * @throws Error on authentication failure (401/403) or after max retries exhausted
      */
     async sendMessage(params: SendMessageParams): Promise<SendMessageResponse> {
-      const { groupId, plainText, blocks, options, botName } = params;
+      const { groupId, plainText, blocks, options, botName, rootMessageId } = params;
 
       // Build request body
       const body: Record<string, unknown> = {
@@ -55,8 +55,11 @@ export function createApiClient(
         body.options = options;
       }
 
-      // Build URL with optional botName query parameter
-      const url = new URL(`/open/v5/groups/${groupId}/messages`, baseUrl);
+      // Build URL: use thread endpoint if rootMessageId is provided
+      const endpoint = rootMessageId
+        ? `/open/v5/groups/${groupId}/threads/${rootMessageId}/messages`
+        : `/open/v5/groups/${groupId}/messages`;
+      const url = new URL(endpoint, baseUrl);
       if (botName) {
         url.searchParams.set('botName', botName);
       }

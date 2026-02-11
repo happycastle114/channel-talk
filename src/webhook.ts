@@ -213,12 +213,15 @@ export async function startChannelTalkWebhook(
     const managerId = refers?.manager?.id ?? entity.personId ?? 'unknown';
     const managerName = refers?.manager?.name ?? managerId;
     const timestamp = entity.createdAt ?? Date.now();
+    const isThreadMessage = entity.threadMsg === true;
+    const rootMessageId = entity.rootMessageId;
 
     log.info('received team chat message', {
       messageId,
       groupId,
       from: managerName,
       preview: plainText.slice(0, 80),
+      thread: isThreadMessage ? rootMessageId : undefined,
     });
 
     const route = core.channel.routing.resolveAgentRoute({
@@ -305,6 +308,7 @@ export async function startChannelTalkWebhook(
               groupId,
               plainText: chunk,
               botName,
+              rootMessageId: isThreadMessage ? rootMessageId : undefined,
             });
           }
         },

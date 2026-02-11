@@ -86,6 +86,8 @@ export interface SendMessageParams {
   options?: MessageOption[];
   /** Bot name to display as sender (optional) */
   botName?: string;
+  /** Root message ID for thread replies (optional) */
+  rootMessageId?: string;
 }
 
 /**
@@ -151,6 +153,14 @@ export interface ChannelTalkEntity {
   personId?: string;
   /** Created timestamp */
   createdAt?: number;
+  /** Whether this is a thread message */
+  threadMsg?: boolean;
+  /** Thread key identifier */
+  threadKey?: string;
+  /** Root message ID (for thread replies) */
+  rootMessageId?: string;
+  /** Whether this is a thread root message */
+  threadRoot?: boolean;
 }
 
 /**
