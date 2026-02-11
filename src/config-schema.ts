@@ -45,7 +45,22 @@ export const ChannelTalkConfigSchema = Type.Object(
     
     /** Group chat policy: 'open' = all groups allowed, 'closed' = none allowed */
     groupPolicy: Type.Optional(
-      Type.Enum(['open', 'closed'], { default: 'open' })
+      Type.Union([Type.Literal('open'), Type.Literal('closed')], { default: 'open' })
+    ),
+
+    /** Allowlist of group IDs (chatIds) to respond to. If set, only these groups get responses. */
+    allowedGroups: Type.Optional(
+      Type.Array(Type.String(), {
+        description: 'List of group chatIds to respond to. If empty or omitted, all groups are allowed (subject to groupPolicy).',
+      })
+    ),
+
+    /** If true, only respond when the bot is mentioned (@botName) in the message. Default: false */
+    mentionOnly: Type.Optional(
+      Type.Boolean({
+        default: false,
+        description: 'Only respond when the bot is mentioned in the message. Similar to Discord mention-only mode.',
+      })
     ),
   },
   {

@@ -8,6 +8,27 @@ const DEFAULT_ACCOUNT_ID = 'default';
 const DEDUP_TTL_MS = 60_000;
 const DEDUP_CLEANUP_INTERVAL_MS = 30_000;
 
+/**
+ * Check if a message mentions the bot.
+ * Matches @botName or common patterns like "봇이름아", "봇이름아,", etc.
+ * If no botName is configured, always returns false (falls through to respond to all).
+ */
+function checkMention(text: string, botName?: string): boolean {
+  if (!botName) return false;
+  const lower = text.toLowerCase();
+  const nameLower = botName.toLowerCase();
+  // Direct @mention
+  if (lower.includes(`@${nameLower}`)) return true;
+  // Name appears at start or as a word boundary
+  const namePattern = new RegExp(`(?:^|\\s)${escapeRegex(nameLower)}(?:[아야,!?\\s]|$)`, 'i');
+  if (namePattern.test(text)) return true;
+  return false;
+}
+
+function escapeRegex(str: string): string {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 export type StartChannelTalkWebhookContext = {
   cfg: OpenClawConfig;
   runtime: { log?: (...args: unknown[]) => void; error?: (...args: unknown[]) => void };
@@ -56,6 +77,8 @@ export async function startChannelTalkWebhook(
   const webhookPath = webhookCfg?.path ?? '/api/channel-talk';
   const botName = channelTalkCfg.botName as string | undefined;
   const accountId = ctx.accountId ?? DEFAULT_ACCOUNT_ID;
+  const allowedGroups = channelTalkCfg.allowedGroups as string[] | undefined;
+  const mentionOnly = channelTalkCfg.mentionOnly as boolean | undefined;
 
   const apiClient = createApiClient({ accessKey, accessSecret }, channelTalkCfg.baseUrl as string | undefined);
 
@@ -151,6 +174,24 @@ export async function startChannelTalkWebhook(
       return;
     }
 
+    // --- Group allowlist filtering ---
+    if (allowedGroups && allowedGroups.length > 0) {
+      if (!allowedGroups.includes(groupId)) {
+        log.debug?.('skipping message from non-allowed group', { groupId });
+        return;
+      }
+    }
+
+    // --- Mention-only filtering ---
+    const wasMentioned = mentionOnly
+      ? checkMention(plainText, botName)
+      : false;
+
+    if (mentionOnly && !wasMentioned) {
+      log.debug?.('skipping non-mentioned message (mentionOnly=true)', { groupId });
+      return;
+    }
+
     const managerId = refers?.manager?.id ?? entity.personId ?? 'unknown';
     const managerName = refers?.manager?.name ?? managerId;
     const timestamp = entity.createdAt ?? Date.now();
@@ -215,7 +256,7 @@ export async function startChannelTalkWebhook(
       Surface: 'channel-talk' as const,
       MessageSid: messageId,
       Timestamp: timestamp,
-      WasMentioned: false,
+      WasMentioned: wasMentioned || !mentionOnly,
       CommandAuthorized: false,
       OriginatingChannel: 'channel-talk' as const,
       OriginatingTo: `group:${groupId}`,
