@@ -32,6 +32,69 @@ export function createApiClient(
 ) {
   return {
     /**
+     * Get messages from a Channel Talk group
+     * @param groupId - Group chat ID
+     * @param options - Query options (limit, sortOrder, since)
+     */
+    async getMessages(groupId: string, options?: {
+      limit?: number;
+      sortOrder?: 'asc' | 'desc';
+      since?: number;
+    }): Promise<Record<string, unknown>> {
+      const url = new URL(`/open/v5/groups/${groupId}/messages`, baseUrl);
+      if (options?.limit) url.searchParams.set('limit', String(options.limit));
+      if (options?.sortOrder) url.searchParams.set('sortOrder', options.sortOrder);
+      if (options?.since) url.searchParams.set('since', String(options.since));
+
+      const response = await fetch(url.toString(), {
+        method: 'GET',
+        headers: {
+          'x-access-key': credentials.accessKey,
+          'x-access-secret': credentials.accessSecret,
+        },
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Failed to get messages (${response.status}): ${errorText}`);
+      }
+
+      return (await response.json()) as Record<string, unknown>;
+    },
+
+    /**
+     * Get thread messages
+     * @param groupId - Group chat ID
+     * @param rootMessageId - Root message ID of the thread
+     * @param options - Query options
+     */
+    async getThreadMessages(groupId: string, rootMessageId: string, options?: {
+      limit?: number;
+      sortOrder?: 'asc' | 'desc';
+      since?: number;
+    }): Promise<Record<string, unknown>> {
+      const url = new URL(`/open/v5/groups/${groupId}/threads/${rootMessageId}/messages`, baseUrl);
+      if (options?.limit) url.searchParams.set('limit', String(options.limit));
+      if (options?.sortOrder) url.searchParams.set('sortOrder', options.sortOrder);
+      if (options?.since) url.searchParams.set('since', String(options.since));
+
+      const response = await fetch(url.toString(), {
+        method: 'GET',
+        headers: {
+          'x-access-key': credentials.accessKey,
+          'x-access-secret': credentials.accessSecret,
+        },
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Failed to get thread messages (${response.status}): ${errorText}`);
+      }
+
+      return (await response.json()) as Record<string, unknown>;
+    },
+
+    /**
      * Send a message to a Channel Talk group
      * Implements retry logic with exponential backoff for 429/5xx errors
      *

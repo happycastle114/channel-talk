@@ -86,6 +86,78 @@ export const channelTalkPlugin: ChannelPlugin<ResolvedChannelTalkAccount> = {
 
   outbound: channelTalkOutbound,
 
+  actions: {
+    listActions: ({ cfg }) => {
+      const raw = readChannelConfig(cfg);
+      const creds = resolveCredentials(raw);
+      if (!creds) return [];
+      return ['read'] as any[];
+    },
+    handleAction: async (ctx) => {
+      if (ctx.action === 'read') {
+        const raw = readChannelConfig(ctx.cfg);
+        const creds = resolveCredentials(raw);
+        if (!creds) {
+          return {
+            isError: true,
+            content: [{ type: 'text', text: 'Channel Talk credentials not configured.' }],
+          };
+        }
+
+        const { createApiClient: createClient } = await import('./api-client.js');
+        const client = createClient(creds, raw?.baseUrl as string | undefined);
+
+        const target = (ctx.params.target ?? ctx.params.to ?? '') as string;
+        if (!target) {
+          return {
+            isError: true,
+            content: [{ type: 'text', text: 'Target (group chatId) is required for read action.' }],
+          };
+        }
+
+        const limit = typeof ctx.params.limit === 'number' ? ctx.params.limit : 20;
+        const threadId = (ctx.params.threadId ?? '') as string;
+
+        try {
+          let data: Record<string, unknown>;
+          if (threadId) {
+            data = await client.getThreadMessages(target, threadId, {
+              limit,
+              sortOrder: 'desc',
+            });
+          } else {
+            data = await client.getMessages(target, {
+              limit,
+              sortOrder: 'desc',
+            });
+          }
+
+          const messages = (data.messages ?? []) as Record<string, unknown>[];
+          const formatted = messages.reverse().map((m) => {
+            const sender = m.personType === 'bot' ? '🤖 Bot' : `👤 ${m.personId ?? 'Unknown'}`;
+            const text = (m.plainText ?? '') as string;
+            const ts = m.createdAt ? new Date(m.createdAt as number).toISOString() : '';
+            const thread = m.threadMsg ? ' [thread]' : '';
+            return `[${ts}] ${sender}${thread}: ${text}`;
+          }).join('\n');
+
+          return {
+            content: [{
+              type: 'text',
+              text: formatted || 'No messages found.',
+            }],
+          };
+        } catch (err) {
+          return {
+            isError: true,
+            content: [{ type: 'text', text: `Failed to read messages: ${String(err)}` }],
+          };
+        }
+      }
+      return null as never;
+    },
+  },
+
   gateway: {
     startAccount: async (ctx) => {
       const port =
