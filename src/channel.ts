@@ -1,5 +1,5 @@
 import type { ChannelPlugin, OpenClawConfig } from 'openclaw/plugin-sdk';
-import { buildChannelConfigSchema, DEFAULT_ACCOUNT_ID } from 'openclaw/plugin-sdk';
+import { DEFAULT_ACCOUNT_ID } from 'openclaw/plugin-sdk';
 import type { ChannelTalkCredentials } from './types.js';
 import { ChannelTalkConfigSchema } from './config-schema.js';
 import { channelTalkOutbound } from './send.js';
@@ -56,7 +56,7 @@ export const channelTalkPlugin: ChannelPlugin<ResolvedChannelTalkAccount> = {
 
   reload: { configPrefixes: ['channels.channel-talk'] },
 
-  configSchema: buildChannelConfigSchema(ChannelTalkConfigSchema as any),
+  configSchema: ChannelTalkConfigSchema,
 
   config: {
     listAccountIds: () => [DEFAULT_ACCOUNT_ID],
