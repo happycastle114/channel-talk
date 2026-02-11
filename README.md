@@ -227,6 +227,16 @@ openclaw gateway start
 - 플러그인은 `personType: "bot"` 메시지를 자동으로 무시합니다
 - 이 문제가 발생하면 로그를 확인해 주세요
 
+### plugin already exists 에러
+
+플러그인이 이미 설치되어 있는 경우:
+
+```bash
+# 기존 플러그인 삭제 후 재설치
+rm -rf ~/.openclaw/extensions/openclaw-channel-talk
+openclaw plugins install @happycastle/openclaw-channel-talk
+```
+
 ### plugin id mismatch 경고
 
 이 플러그인의 plugin id는 `openclaw-channel-talk`입니다.
