@@ -117,7 +117,22 @@ export async function startChannelTalkWebhook(
       return;
     }
 
-    void handleWebhookEvent(body).catch((err: unknown) => {
+    // Debug: log raw incoming payload structure
+    log.info('webhook received', {
+      keys: Object.keys(body as Record<string, unknown>),
+      event: (body as Record<string, unknown>).event,
+      type: (body as Record<string, unknown>).type,
+      hasEntity: !!(body as Record<string, unknown>).entity,
+      hasRefers: !!(body as Record<string, unknown>).refers,
+      hasBody: !!(body as Record<string, unknown>).body,
+    });
+
+    // If payload is wrapped (e.g., n8n sends { body: { event, entity, ... } }), unwrap it
+    const unwrapped = ((body as Record<string, unknown>).event
+      ? body
+      : (body as Record<string, unknown>).body ?? (body as Record<string, unknown>).data ?? body) as ChannelTalkWebhookEvent;
+
+    void handleWebhookEvent(unwrapped).catch((err: unknown) => {
       log.error('webhook handler error', { error: String(err) });
     });
   });
